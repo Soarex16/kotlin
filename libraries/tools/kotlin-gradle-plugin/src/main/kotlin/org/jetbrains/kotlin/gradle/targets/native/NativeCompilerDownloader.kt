@@ -133,7 +133,8 @@ class NativeCompilerDownloader(
         logger.lifecycle("\nPlease wait while Kotlin/Native compiler $compilerVersion is being installed.")
 
         val suffix = project.probeRemoteFileLength(dependencyUrl, probingTimeoutMs = 200)?.let { " (${formatContentLength(it)})" }.orEmpty()
-        logger.lifecycle("DEBBUG: Download $dependencyUrl$suffix")
+    //    DEBBUG: Download https://download.jetbrains.com/kotlin/native/builds/dev/1.7.0-dev-1016/linux-x86_64/kotlin-native-prebuilt-linux-x86_64-1.7.0-dev-1016.tar.gz
+        logger.lifecycle("DEBBUG: Download $dependencyUrl$suffix (suffix = $suffix)")
         val archive = logger.lifecycleWithDuration("Download $dependencyUrl finished,") {
             configuration.files.single()
         }
