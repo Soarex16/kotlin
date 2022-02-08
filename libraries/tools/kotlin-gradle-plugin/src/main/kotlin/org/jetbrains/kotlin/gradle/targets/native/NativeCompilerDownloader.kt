@@ -133,7 +133,7 @@ class NativeCompilerDownloader(
         logger.lifecycle("\nPlease wait while Kotlin/Native compiler $compilerVersion is being installed.")
 
         val suffix = project.probeRemoteFileLength(dependencyUrl, probingTimeoutMs = 200)?.let { " (${formatContentLength(it)})" }.orEmpty()
-        logger.lifecycle("Download $dependencyUrl$suffix")
+        logger.lifecycle("DEBBUG: Download $dependencyUrl$suffix")
         val archive = logger.lifecycleWithDuration("Download $dependencyUrl finished,") {
             configuration.files.single()
         }
