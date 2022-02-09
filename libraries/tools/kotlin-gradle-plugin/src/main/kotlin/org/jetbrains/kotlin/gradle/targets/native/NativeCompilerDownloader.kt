@@ -119,6 +119,10 @@ class NativeCompilerDownloader(
         }
         val dependencyUrl = "$repoUrl/$dependencyFileName" //  repoUrl/kotlin-native-prebuilt-linux-x86_64-1.7.0-dev-1017.tar.gz
 
+        val kotlinBuildNumber = System.getProperty("versions.kotlin-native")
+
+        logger.lifecycle("System.getProperty(\"versions.kotlin-native\") = $libraryVersion")
+
         val compilerArtifactName = "kotlin-native-dist-linux-x86_64-${kotlinBuildNumber}.tar.gz"
         val compilerConfiguration = "Kotlin_BuildPlayground_Moon_KotlinNativeDist_linux_x64_DIST?mode=builds#all-projects"
         val downloadUrlDirectory = "https://buildserver.labs.intellij.net/guestAuth/app/rest/builds/buildType:(id:$compilerConfiguration),status:success/artifacts/content/$compilerArtifactName"
