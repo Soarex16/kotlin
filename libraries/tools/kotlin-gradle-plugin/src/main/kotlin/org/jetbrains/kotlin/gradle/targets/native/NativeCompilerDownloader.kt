@@ -121,7 +121,7 @@ class NativeCompilerDownloader(
 
         val kotlinBuildNumber = System.getProperty("versions.kotlin-native")
 
-        logger.lifecycle("System.getProperty(\"versions.kotlin-native\") = $libraryVersion")
+        logger.lifecycle("System.getProperty(\"versions.kotlin-native\") = $kotlinBuildNumber")
 
         val compilerArtifactName = "kotlin-native-dist-linux-x86_64-${kotlinBuildNumber}.tar.gz"
         val compilerConfiguration = "Kotlin_BuildPlayground_Moon_KotlinNativeDist_linux_x64_DIST?mode=builds#all-projects"
