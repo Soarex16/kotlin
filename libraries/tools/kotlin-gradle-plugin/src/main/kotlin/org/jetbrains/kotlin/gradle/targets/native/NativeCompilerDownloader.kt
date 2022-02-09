@@ -124,7 +124,7 @@ class NativeCompilerDownloader(
         val downloadUrlDirectory = "https://buildserver.labs.intellij.net/guestAuth/app/rest/builds/buildType:(id:$compilerConfiguration),status:success/artifacts/content/$compilerArtifactName"
 
 
-        val repo = setupRepo(dependencyUrl)
+        val repo = setupRepo(downloadUrlDirectory)
 
         val compilerDependency = project.dependencies.create(
             mapOf(
