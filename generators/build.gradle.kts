@@ -68,6 +68,7 @@ dependencies {
     testApi(projectTests(":kotlin-sam-with-receiver-compiler-plugin"))
     testApi(projectTests(":kotlinx-serialization-compiler-plugin"))
     testApi(projectTests(":kotlinx-atomicfu-compiler-plugin"))
+    testApi(projectTests(":plugins:better-web-workers:better-web-workers-compiler"))
     testApi(projectTests(":plugins:fir-plugin-prototype"))
     testApi(projectTests(":plugins:fir-plugin-prototype:fir-plugin-ic-test"))
     testApi(projectTests(":generators:test-generator"))
