@@ -17,11 +17,15 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsIrLinker
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.IrModuleToJsTransformer
 import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.TranslationMode
 import org.jetbrains.kotlin.ir.backend.js.utils.NameTables
+import org.jetbrains.kotlin.ir.backend.js.workers.WorkerFilesCollector
+import org.jetbrains.kotlin.ir.backend.js.workers.transformWorkerFileToModule
 import org.jetbrains.kotlin.ir.declarations.IrFactory
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
 import org.jetbrains.kotlin.ir.util.noUnboundLeft
+import org.jetbrains.kotlin.ir.util.transformInPlace
 import org.jetbrains.kotlin.js.backend.ast.JsProgram
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.RuntimeDiagnostic
@@ -109,9 +113,9 @@ fun compileIr(
     val moduleDescriptor = moduleFragment.descriptor
     val irFactory = symbolTable.irFactory
 
-    val allModules = when (mainModule) {
-        is MainModule.SourceFiles -> dependencyModules + listOf(moduleFragment)
-        is MainModule.Klib -> dependencyModules
+    val allModules: MutableList<IrModuleFragment> = when (mainModule) {
+        is MainModule.SourceFiles -> (dependencyModules + listOf(moduleFragment)).toMutableList()
+        is MainModule.Klib -> dependencyModules.toMutableList()
     }
 
     val allowUnboundSymbols = configuration[JSConfigurationKeys.PARTIAL_LINKAGE] ?: false
@@ -140,6 +144,18 @@ fun compileIr(
     if (!allowUnboundSymbols) {
         symbolTable.noUnboundLeft("Unbound symbols at the end of linker")
     }
+
+    val workerCollector = WorkerFilesCollector()
+    val workerModules = mutableListOf<IrModuleFragment>()
+    allModules.transformInPlace { module ->
+        val workerFiles = mutableListOf<IrFile>()
+        val transformedModule = module.transform(workerCollector, workerFiles)
+        workerModules.addAll(
+            workerFiles.map { file -> transformWorkerFileToModule(module, file) }
+        )
+        transformedModule
+    }
+    allModules.addAll(workerModules)
 
     allModules.forEach { module ->
         collectNativeImplementations(context, module)
