@@ -3,8 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package kotlinx.webworkers
+package kotlinx.webworkers.annotations
 
-@Target(AnnotationTarget.FILE)
+@Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
-annotation class WebWorker
+annotation class WebWorker(val workerId: String)

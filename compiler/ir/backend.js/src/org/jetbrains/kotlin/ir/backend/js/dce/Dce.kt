@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.ir.backend.js.dce
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
+import org.jetbrains.kotlin.ir.backend.js.lower.workers.collectWorkerFunctions
 import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
@@ -102,6 +103,8 @@ private fun buildRoots(modules: Iterable<IrModuleFragment>, context: JsIrBackend
             declaration.addRootsTo(declarationsCollector, context)
         }
     }
+
+    addAll(modules.flatMap { collectWorkerFunctions(it).values })
 
     val dceRuntimeDiagnostic = context.dceRuntimeDiagnostic
     if (dceRuntimeDiagnostic != null) {
