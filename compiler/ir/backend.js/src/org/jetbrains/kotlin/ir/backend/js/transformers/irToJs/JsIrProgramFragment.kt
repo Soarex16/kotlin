@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.ir.backend.js.transformers.irToJs
 
 import org.jetbrains.kotlin.ir.backend.js.utils.toJsIdentifier
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.js.backend.ast.*
 
 class JsIrProgramFragment(val packageFqn: String) {
@@ -24,10 +25,17 @@ class JsIrProgramFragment(val packageFqn: String) {
     val polyfills = JsCompositeBlock()
 }
 
+sealed class JsModuleType {
+    object Normal : JsModuleType()
+    class WorkerStub(val workerName: String, val sourceFunction: IrSimpleFunction) : JsModuleType()
+}
+
 class JsIrModule(
     val moduleName: String,
     val externalModuleName: String,
-    val fragments: List<JsIrProgramFragment>
+    val fragments: List<JsIrProgramFragment>,
+    // to distinguish worker entrypoints from other module types
+    var type: JsModuleType = JsModuleType.Normal
 ) {
     fun makeModuleHeader(): JsIrModuleHeader {
         val nameBindings = mutableMapOf<String, String>()
@@ -97,7 +105,13 @@ class CrossModuleDependenciesResolver(private val headers: List<JsIrModuleHeader
             }
         }
 
-        return headers.associateWith { headerToBuilder[it]!!.buildCrossModuleRefs() }
+        val references = mutableMapOf<JsIrModuleHeader, CrossModuleReferences>()
+        val (workerHeaders, moduleHeaders) = headers.partition { it.associatedModule?.type is JsModuleType.WorkerStub }
+
+        moduleHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs() }
+        workerHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs(moduleHeaders) }
+
+        return references
     }
 }
 
@@ -117,7 +131,7 @@ private class JsIrModuleCrossModuleReferecenceBuilder(val header: JsIrModuleHead
         exportNames = exports.sorted().associateWith { index++.toJsIdentifier() }
     }
 
-    fun buildCrossModuleRefs(): CrossModuleReferences {
+    fun buildCrossModuleRefs(additionalImports: List<JsIrModuleHeader> = emptyList()): CrossModuleReferences {
         buildExportNames()
         val importedModules = mutableMapOf<JsIrModuleHeader, JsImportedModule>()
 
@@ -127,6 +141,8 @@ private class JsIrModuleCrossModuleReferecenceBuilder(val header: JsIrModuleHead
                 JsImportedModule(moduleHeader.externalModuleName, jsModuleName, null, relativeRequirePath)
             }.internalName
         }
+
+        additionalImports.forEach { import(it) }
 
         val resultImports = imports.associate { crossModuleRef ->
             val tag = crossModuleRef.tag

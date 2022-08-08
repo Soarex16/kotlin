@@ -7,17 +7,28 @@ package org.jetbrains.kotlin.ir.backend.js.transformers.irToJs
 
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.ir.backend.js.*
+import org.jetbrains.kotlin.ir.backend.js.CompilationOutputs
+import org.jetbrains.kotlin.ir.backend.js.CompilerResult
+import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.dce.eliminateDeadDeclarations
 import org.jetbrains.kotlin.ir.backend.js.export.*
 import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
+import org.jetbrains.kotlin.ir.backend.js.lower.workers.collectWorkerFunctions
 import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.backend.js.utils.serialization.JsIrAstSerializer
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.interpreter.toIrConst
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.classifierOrFail
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.render
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.js.backend.JsToStringGenerationVisitor
 import org.jetbrains.kotlin.js.backend.NoOpSourceLocationConsumer
 import org.jetbrains.kotlin.js.backend.SourceLocationConsumer
@@ -28,6 +39,7 @@ import org.jetbrains.kotlin.js.sourceMap.SourceFilePathResolver
 import org.jetbrains.kotlin.js.sourceMap.SourceMap3Builder
 import org.jetbrains.kotlin.js.sourceMap.SourceMapBuilderConsumer
 import org.jetbrains.kotlin.js.util.TextOutputImpl
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.serialization.js.ModuleKind
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -127,6 +139,27 @@ class IrModuleToJsTransformerTmp(
         return CompilerResult(result, dts)
     }
 
+    private fun transformWorkerReferences(workerFunctions: Map<String, String>, module: IrModuleFragment) {
+        val workerFqN = FqName("org.w3c.dom.Worker")
+        val workerRefTransformer = object : IrElementTransformerVoid() {
+            override fun visitConstructorCall(expression: IrConstructorCall): IrExpression {
+                if (expression.type.classFqName == workerFqN) {
+                    @Suppress("UNCHECKED_CAST")
+                    val workerIdValue = expression.getValueArgument(0) as IrConst<String>
+                    val workerId = workerIdValue.value
+                    val transformedWorkerId = if (workerId in workerFunctions) {
+                        "./${workerFunctions[workerId]}.js"
+                    } else {
+                        workerId
+                    }
+                    expression.putValueArgument(0, transformedWorkerId.toIrConst(workerIdValue.type))
+                }
+                return super.visitConstructorCall(expression)
+            }
+        }
+        module.transformChildrenVoid(workerRefTransformer)
+    }
+
     fun generateBinaryAst(files: Collection<IrFile>, allModules: Collection<IrModuleFragment>): List<JsIrFragmentAndBinaryAst> {
         val exportModelGenerator = ExportModelGenerator(backendContext, generateNamespacesForPackages = true)
 
@@ -148,6 +181,7 @@ class IrModuleToJsTransformerTmp(
         }
     }
 
+    // TODO: generate exports
     private fun ExportModelGenerator.generateExportWithExternals(irFile: IrFile): List<ExportedDeclaration> {
         val exports = generateExport(irFile)
         val additionalExports = backendContext.externalPackageFragment[irFile.symbol]?.let { generateExport(it) } ?: emptyList()
@@ -163,24 +197,75 @@ class IrModuleToJsTransformerTmp(
         exportData: Map<IrModuleFragment, Map<IrFile, List<ExportedDeclaration>>>,
         minimizedMemberNames: Boolean
     ): JsIrProgram {
+        val workerModulesMapping = modules
+            // may be same worker name in different modules
+            .map { collectWorkerFunctions(it) }
+            .fold(mutableMapOf<String, IrSimpleFunction>()) { allWorkers, collectedWorkersInModule ->
+                allWorkers.apply { putAll(collectedWorkersInModule) }
+            }
+            .mapValues { "${it.value.file.module.safeName}_worker_${it.key}".safeModuleName }
+        modules.forEach { transformWorkerReferences(workerModulesMapping, it) }
+
         return JsIrProgram(
-            modules.map { m ->
-                JsIrModule(
-                    m.safeName,
-                    m.externalModuleName(),
-                    m.files.map {
-                        val exports = exportData[m]!![it]!!
-                        generateProgramFragment(it, exports, minimizedMemberNames)
-                    },
-                )
+            buildList {
+                modules.forEach { m ->
+                    val workerFunctions = collectWorkerFunctions(m)
+
+                    workerFunctions.forEach { (workerName, workerFun) ->
+                        val workerModuleName = workerModulesMapping[workerName] ?: workerName
+                        add(
+                            JsIrModule(
+                                workerModuleName,
+                                sanitizeName(workerModuleName),
+                                listOf(
+                                    generateEntryPointForWorker(workerFun, minimizedMemberNames)
+                                ),
+                                type = JsModuleType.WorkerStub(workerName, workerFun)
+                            )
+                        )
+                    }
+
+                    add(
+                        JsIrModule(
+                            m.safeName,
+                            m.externalModuleName(),
+                            m.files.map {
+                                val exports = exportData[m]!![it]!!
+                                generateProgramFragment(it, exports, minimizedMemberNames)
+                            },
+                        )
+                    )
+                }
             }
         )
+    }
+
+    // TODO: mangling support
+    private fun generateEntryPointForWorker(
+        workerFun: IrSimpleFunction,
+        minimizedMemberNames: Boolean
+    ): JsIrProgramFragment {
+        val nameGenerator = JsNameLinkingNamer(backendContext, minimizedMemberNames)
+        val result = JsIrProgramFragment(workerFun.file.fqName.asString()).apply {
+            // later we also add importScripts(...)
+            declarations.statements += JsInvocation(
+                nameGenerator.getNameForStaticFunction(workerFun).makeRef(),
+                listOf(JsNameRef("self"))
+            ).makeStmt()
+        }
+        result.fillImportsInfo(nameGenerator)
+
+        return result
     }
 
     private val generateFilePaths = backendContext.configuration.getBoolean(JSConfigurationKeys.GENERATE_COMMENTS_WITH_FILE_PATH)
     private val pathPrefixMap = backendContext.configuration.getMap(JSConfigurationKeys.FILE_PATHS_PREFIX_MAP)
 
-    private fun generateProgramFragment(file: IrFile, exports: List<ExportedDeclaration>, minimizedMemberNames: Boolean): JsIrProgramFragment {
+    private fun generateProgramFragment(
+        file: IrFile,
+        exports: List<ExportedDeclaration>,
+        minimizedMemberNames: Boolean
+    ): JsIrProgramFragment {
         val nameGenerator = JsNameLinkingNamer(backendContext, minimizedMemberNames)
 
         val globalNameScope = NameTable<IrDeclaration>()
@@ -254,7 +339,9 @@ class IrModuleToJsTransformerTmp(
                 val jsName = staticContext.getNameForStaticFunction(it)
                 val generateArgv = it.valueParameters.firstOrNull()?.isStringArrayParameter() ?: false
                 val generateContinuation = it.isLoweredSuspendFunction(backendContext)
-                result.mainFunction = JsInvocation(jsName.makeRef(), generateMainArguments(generateArgv, generateContinuation, staticContext)).makeStmt()
+                result.mainFunction = wrapWithWorkerCondition(
+                    JsInvocation(jsName.makeRef(), generateMainArguments(generateArgv, generateContinuation, staticContext)).makeStmt()
+                )
             }
         }
 
@@ -305,6 +392,44 @@ class IrModuleToJsTransformerTmp(
         return result
     }
 
+    private fun JsIrProgramFragment.fillImportsInfo(nameGenerator: JsNameLinkingNamer, declarations: Set<IrDeclaration> = emptySet()) {
+        fun computeTag(declaration: IrDeclaration): String? {
+            val tag = (backendContext.irFactory as IdSignatureRetriever).declarationSignature(declaration)?.toString()
+
+            if (tag == null && declaration !in declarations) {
+                error("signature for ${declaration.render()} not found")
+            }
+
+            return tag
+        }
+
+        nameGenerator.nameMap.entries.forEach { (declaration, name) ->
+            computeTag(declaration)?.let { tag ->
+                this.nameBindings[tag] = name
+            }
+        }
+
+        nameGenerator.imports.entries.forEach { (declaration, importExpression) ->
+            val tag = computeTag(declaration) ?: error("No tag for imported declaration ${declaration.render()}")
+            this.imports[tag] = importExpression
+        }
+    }
+
+    private fun wrapWithWorkerCondition(stmt: JsStatement): JsStatement {
+        // if (typeof WorkerGlobalScope === 'undefined') {
+        // stmt
+        // }
+        return with(JsAstUtils) {
+            newJsIf(
+                typeOfIs(
+                    JsNameRef("WorkerGlobalScope"),
+                    JsStringLiteral("undefined")
+                ),
+                stmt
+            )
+        }
+    }
+
     private fun generateMainArguments(
         generateArgv: Boolean,
         generateContinuation: Boolean,
@@ -334,14 +459,11 @@ private fun generateWrappedModuleBody(
     relativeRequirePath: Boolean,
     generateScriptModule: Boolean
 ): CompilationOutputs {
-    if (multiModule) {
+    val moduleToRef = program.crossModuleDependencies(relativeRequirePath)
 
-        val moduleToRef = program.crossModuleDependencies(relativeRequirePath)
-
+    val (compiledMain, others) = if (multiModule) {
         val main = program.mainModule
-        val others = program.otherModules
-
-        val mainModule = generateSingleWrappedModuleBody(
+        val module = generateSingleWrappedModuleBody(
             mainModuleName,
             moduleKind,
             main.fragments,
@@ -350,32 +472,44 @@ private fun generateWrappedModuleBody(
             generateCallToMain = true,
             moduleToRef[main]!!,
         )
-
-        val dependencies = others.map { module ->
-            val moduleName = module.externalModuleName
-
-            moduleName to generateSingleWrappedModuleBody(
-                moduleName,
-                moduleKind,
-                module.fragments,
-                sourceMapsInfo,
-                generateScriptModule,
-                generateCallToMain = false,
-                moduleToRef[module]!!,
-            )
+        Pair(module, program.otherModules)
+    } else {
+        val (workerEntryPoints, otherModules) = program.modules.partition { it.type is JsModuleType.WorkerStub }
+        if (workerEntryPoints.isNotEmpty()) {
+            error("Workers supported only in multi module builds")
         }
 
-        return CompilationOutputs(mainModule.jsCode, mainModule.jsProgram, mainModule.sourceMap, dependencies)
-    } else {
-        return generateSingleWrappedModuleBody(
+        val module = generateSingleWrappedModuleBody(
             mainModuleName,
             moduleKind,
-            program.modules.flatMap { it.fragments },
+            otherModules.flatMap { it.fragments },
             sourceMapsInfo,
             generateScriptModule,
             generateCallToMain = true,
         )
+        Pair(module, workerEntryPoints)
     }
+
+    val dependencies = others.map { module ->
+        val moduleName = module.externalModuleName
+        val kind = if (module.type is JsModuleType.WorkerStub) {
+            ModuleKind.WORKER
+        } else {
+            moduleKind
+        }
+
+        moduleName to generateSingleWrappedModuleBody(
+            moduleName,
+            kind,
+            module.fragments,
+            sourceMapsInfo,
+            generateScriptModule,
+            generateCallToMain = false,
+            moduleToRef[module]!!,
+        )
+    }
+
+    return CompilationOutputs(compiledMain.jsCode, compiledMain.jsProgram, compiledMain.sourceMap, dependencies)
 }
 
 fun generateSingleWrappedModuleBody(
@@ -425,11 +559,10 @@ fun generateSingleWrappedModuleBody(
     }
 
     program.accept(JsToStringGenerationVisitor(jsCode, sourceMapBuilderConsumer))
-
     return CompilationOutputs(
         jsCode.toString(),
         program,
-        sourceMapBuilder?.build()
+        sourceMapBuilder?.build(),
     )
 }
 
