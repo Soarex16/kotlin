@@ -48,7 +48,7 @@ class ExportModelToTsDeclarations {
 
         return when (module.moduleKind) {
             ModuleKind.PLAIN -> "declare namespace $namespaceName {\n$declarationsDts\n}\n"
-            ModuleKind.AMD, ModuleKind.COMMON_JS, ModuleKind.ES -> declarationsDts
+            ModuleKind.AMD, ModuleKind.COMMON_JS, ModuleKind.ES, ModuleKind.WORKER -> declarationsDts
             ModuleKind.UMD -> "$declarationsDts\nexport as namespace $namespaceName;"
         }
     }

@@ -1,18 +1,16 @@
+import plugins.signLibraryPublication
+
+description = "Runtime library for the WebWorkers compiler plugin"
+
 plugins {
     kotlin("js")
     `maven-publish`
 }
 
 group = "kotlinx.webworkers"
-version = "0.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation(kotlin("stdlib-js"))
-    testImplementation(kotlin("test"))
 }
 
 kotlin {
@@ -21,9 +19,17 @@ kotlin {
         nodejs()
         binaries.library()
     }
+
+    sourceSets {
+        js(IR).compilations["main"].defaultSourceSet {
+            dependencies {
+                compileOnly(kotlin("stdlib-js"))
+            }
+        }
+    }
 }
 
-configureCommonPublicationSettingsForGradle(signingRequired = false)
+configureCommonPublicationSettingsForGradle(signLibraryPublication)
 
 publishing {
     publications {

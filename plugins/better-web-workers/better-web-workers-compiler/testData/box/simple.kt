@@ -1,27 +1,11 @@
 // TARGET_BACKEND: JS_IR
 // WITH_STDLIB
 // WITH_COROUTINES
-// FILE: demo_worker.kt
-@file:WebWorker
-package test.worker
-
-import kotlinx.webworkers.WebWorker
-import org.w3c.dom.DedicatedWorkerGlobalScope
-import org.w3c.dom.MessageEvent
-
-external val self: DedicatedWorkerGlobalScope
-
-fun main() {
-    self.addEventListener("message", { event ->
-        if (event !is MessageEvent) return@addEventListener
-
-        self.postMessage(event.data)
-    })
-}
-
 // FILE: main.kt
 package test.main
 
+import kotlinx.webworkers.annotations.WebWorker
+import org.w3c.dom.DedicatedWorkerGlobalScope
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 import helpers.*
@@ -35,7 +19,7 @@ fun builder(c: suspend () -> Unit) {
 
 var result = "fail"
 fun box(): String {
-    val worker = Worker("./demo_worker.js")
+    val worker = Worker("demo_worker")
 
     builder {
         val job = GlobalScope.launch {
@@ -55,4 +39,13 @@ fun box(): String {
     }
 
     return result
+}
+
+@WebWorker("demo_worker")
+fun worker(self: DedicatedWorkerGlobalScope) {
+    self.addEventListener("message", { event ->
+        if (event !is MessageEvent) return@addEventListener
+
+        self.postMessage(event.data)
+    })
 }
