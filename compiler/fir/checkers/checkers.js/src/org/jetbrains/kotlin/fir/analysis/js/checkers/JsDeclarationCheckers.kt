@@ -10,11 +10,13 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirFunctionChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirPropertyChecker
 import org.jetbrains.kotlin.fir.analysis.js.checkers.declaration.FirJsInlineDeclarationChecker
 import org.jetbrains.kotlin.fir.analysis.js.checkers.declaration.FirJsInlinePropertyChecker
+import org.jetbrains.kotlin.fir.analysis.js.checkers.declaration.FirWorkerAnnotatedJsDeclarationChecker
 
 object JsDeclarationCheckers : DeclarationCheckers() {
     override val functionCheckers: Set<FirFunctionChecker>
         get() = setOf(
             FirJsInlineDeclarationChecker,
+            FirWorkerAnnotatedJsDeclarationChecker,
         )
 
     override val propertyCheckers: Set<FirPropertyChecker>

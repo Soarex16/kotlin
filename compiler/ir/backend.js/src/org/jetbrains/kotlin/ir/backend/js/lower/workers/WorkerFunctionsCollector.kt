@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -36,17 +35,10 @@ private class WorkerFunctionsCollector : IrElementVisitorVoid {
         super.visitSimpleFunction(declaration)
         val workerAnnotation = declaration.getAnnotation(WEB_WORKER_ANNOTATION) ?: return
 
-        require(declaration.dispatchReceiverParameter == null) { "worker must be top-level function" }
-        // allow to receive arguments and put DedicatedWorkerGlobalScope as context receiver?
-        require(
-            declaration.valueParameters.size == 1
-                    && declaration.valueParameters.single().type.classFqName == DEDICATED_WORKER_GLOBAL_SCOPE
-        ) { "worker must have only one argument of type 'DedicatedWorkerGlobalScope'" }
         @Suppress("UNCHECKED_CAST")
         val workerId = (workerAnnotation.getValueArgument(0) as IrConst<String>).value
 
         // TODO: should be done on FE?
-        require(workerId.isNotBlank()) { "Worker id cannot be blank or empty" }
         require(workerId !in workerFunctions) { "Found two worker functions with the same worker id: '$workerId'" }
 
         workerFunctions[workerId] = declaration

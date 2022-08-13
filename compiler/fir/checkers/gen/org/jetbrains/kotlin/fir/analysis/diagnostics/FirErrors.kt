@@ -256,6 +256,10 @@ object FirErrors {
     val WRONG_EXTENSION_FUNCTION_TYPE by error0<KtAnnotationEntry>()
     val WRONG_EXTENSION_FUNCTION_TYPE_WARNING by warning0<KtAnnotationEntry>()
 
+    val INAPPLICABLE_TARGET_WORKER_FUNCTION by error0<KtAnnotationEntry>()
+    val WORKER_FUNCTION_ADDITIONAL_ARGUMENTS_NOT_ALLOWED by error0<KtAnnotationEntry>()
+    val ILLEGAL_ARGUMENT_IN_WORKER_ANNOTATION by error0<KtAnnotationEntry>()
+
     // OptIn
     val OPT_IN_USAGE by warning2<PsiElement, FqName, String>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
     val OPT_IN_USAGE_ERROR by error2<PsiElement, FqName, String>(SourceElementPositioningStrategies.REFERENCE_BY_QUALIFIED)
