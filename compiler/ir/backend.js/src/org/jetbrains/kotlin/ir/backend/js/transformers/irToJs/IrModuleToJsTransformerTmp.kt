@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.dce.eliminateDeadDeclarations
 import org.jetbrains.kotlin.ir.backend.js.export.*
 import org.jetbrains.kotlin.ir.backend.js.lower.StaticMembersLowering
+import org.jetbrains.kotlin.ir.backend.js.lower.workers.checkDomAccessInWorker
 import org.jetbrains.kotlin.ir.backend.js.lower.workers.collectWorkerFunctions
 import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.backend.js.utils.serialization.JsIrAstSerializer
@@ -210,6 +211,7 @@ class IrModuleToJsTransformerTmp(
             buildList {
                 modules.forEach { m ->
                     val workerFunctions = collectWorkerFunctions(m)
+                    checkDomAccessInWorker(workerFunctions.map { it.value }, backendContext)
 
                     workerFunctions.forEach { (workerName, workerFun) ->
                         val workerModuleName = workerModulesMapping[workerName] ?: workerName

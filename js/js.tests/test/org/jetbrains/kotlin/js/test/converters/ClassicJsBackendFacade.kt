@@ -46,7 +46,7 @@ class ClassicJsBackendFacade(
                         "$content\n" +
                         "$KOTLIN_TEST_INTERNAL.endModule(\"$escapedModuleId\");"
 
-                ModuleKind.AMD, ModuleKind.UMD ->
+                ModuleKind.AMD, ModuleKind.UMD, ModuleKind.WORKER ->
                     "if (typeof $KOTLIN_TEST_INTERNAL !== \"undefined\") { " +
                             "$KOTLIN_TEST_INTERNAL.setModuleId(\"$escapedModuleId\"); }\n" +
                             "$content\n"
