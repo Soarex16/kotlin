@@ -821,6 +821,21 @@ internal class WrongExtensionFunctionTypeWarningImpl(
     override val token: KtLifetimeToken,
 ) : KtFirDiagnostic.WrongExtensionFunctionTypeWarning(), KtAbstractFirDiagnostic<KtAnnotationEntry>
 
+internal class InapplicableTargetWorkerFunctionImpl(
+    override val firDiagnostic: KtPsiDiagnostic,
+    override val token: KtLifetimeToken,
+) : KtFirDiagnostic.InapplicableTargetWorkerFunction(), KtAbstractFirDiagnostic<KtAnnotationEntry>
+
+internal class WorkerFunctionAdditionalArgumentsNotAllowedImpl(
+    override val firDiagnostic: KtPsiDiagnostic,
+    override val token: KtLifetimeToken,
+) : KtFirDiagnostic.WorkerFunctionAdditionalArgumentsNotAllowed(), KtAbstractFirDiagnostic<KtAnnotationEntry>
+
+internal class IllegalArgumentInWorkerAnnotationImpl(
+    override val firDiagnostic: KtPsiDiagnostic,
+    override val token: KtLifetimeToken,
+) : KtFirDiagnostic.IllegalArgumentInWorkerAnnotation(), KtAbstractFirDiagnostic<KtAnnotationEntry>
+
 internal class OptInUsageImpl(
     override val optInMarkerFqName: FqName,
     override val message: String,

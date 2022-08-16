@@ -946,6 +946,24 @@ internal val KT_DIAGNOSTIC_CONVERTER = KtDiagnosticConverterBuilder.buildConvert
             token,
         )
     }
+    add(FirErrors.INAPPLICABLE_TARGET_WORKER_FUNCTION) { firDiagnostic ->
+        InapplicableTargetWorkerFunctionImpl(
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.WORKER_FUNCTION_ADDITIONAL_ARGUMENTS_NOT_ALLOWED) { firDiagnostic ->
+        WorkerFunctionAdditionalArgumentsNotAllowedImpl(
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
+    add(FirErrors.ILLEGAL_ARGUMENT_IN_WORKER_ANNOTATION) { firDiagnostic ->
+        IllegalArgumentInWorkerAnnotationImpl(
+            firDiagnostic as KtPsiDiagnostic,
+            token,
+        )
+    }
     add(FirErrors.OPT_IN_USAGE) { firDiagnostic ->
         OptInUsageImpl(
             firDiagnostic.a,

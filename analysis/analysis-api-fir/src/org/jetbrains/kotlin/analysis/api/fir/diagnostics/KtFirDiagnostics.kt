@@ -684,6 +684,18 @@ sealed class KtFirDiagnostic<PSI : PsiElement> : KtDiagnosticWithPsi<PSI> {
         override val diagnosticClass get() = WrongExtensionFunctionTypeWarning::class
     }
 
+    abstract class InapplicableTargetWorkerFunction : KtFirDiagnostic<KtAnnotationEntry>() {
+        override val diagnosticClass get() = InapplicableTargetWorkerFunction::class
+    }
+
+    abstract class WorkerFunctionAdditionalArgumentsNotAllowed : KtFirDiagnostic<KtAnnotationEntry>() {
+        override val diagnosticClass get() = WorkerFunctionAdditionalArgumentsNotAllowed::class
+    }
+
+    abstract class IllegalArgumentInWorkerAnnotation : KtFirDiagnostic<KtAnnotationEntry>() {
+        override val diagnosticClass get() = IllegalArgumentInWorkerAnnotation::class
+    }
+
     abstract class OptInUsage : KtFirDiagnostic<PsiElement>() {
         override val diagnosticClass get() = OptInUsage::class
         abstract val optInMarkerFqName: FqName

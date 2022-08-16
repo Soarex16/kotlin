@@ -15,8 +15,6 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.diagnostics.WhenMissingCase
-import org.jetbrains.kotlin.diagnostics.deprecationError2
-import org.jetbrains.kotlin.diagnostics.error0
 import org.jetbrains.kotlin.fir.FirModuleData
 import org.jetbrains.kotlin.fir.PrivateForInline
 import org.jetbrains.kotlin.fir.checkers.generator.diagnostics.model.*
@@ -290,6 +288,10 @@ object DIAGNOSTICS_LIST : DiagnosticList("FirErrors") {
         val NOT_A_CLASS by error<PsiElement>()
         val WRONG_EXTENSION_FUNCTION_TYPE by error<KtAnnotationEntry>()
         val WRONG_EXTENSION_FUNCTION_TYPE_WARNING by warning<KtAnnotationEntry>()
+
+        val INAPPLICABLE_TARGET_WORKER_FUNCTION by error<KtAnnotationEntry>(PositioningStrategy.ANNOTATION_USE_SITE)
+        val WORKER_FUNCTION_ADDITIONAL_ARGUMENTS_NOT_ALLOWED by error<KtAnnotationEntry>(PositioningStrategy.ANNOTATION_USE_SITE)
+        val ILLEGAL_ARGUMENT_IN_WORKER_ANNOTATION by error<KtAnnotationEntry>(PositioningStrategy.ANNOTATION_USE_SITE)
     }
 
     val OPT_IN by object : DiagnosticGroup("OptIn") {
