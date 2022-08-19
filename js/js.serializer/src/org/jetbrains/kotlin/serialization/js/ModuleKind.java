@@ -23,6 +23,5 @@ public enum ModuleKind {
     AMD,
     COMMON_JS,
     UMD,
-    WORKER,
     ES
 }

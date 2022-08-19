@@ -815,6 +815,9 @@ project(':kotlinx-atomicfu-compiler-plugin').projectDir = file("$rootDir/plugins
 project(':kotlinx-atomicfu-runtime').projectDir = file("$rootDir/plugins/atomicfu/atomicfu-runtime")
 project(':atomicfu').projectDir = file("$rootDir/libraries/tools/atomicfu")
 
+project(':plugins:better-web-workers:better-web-workers-compiler').projectDir = file("$rootDir/plugins/better-web-workers/better-web-workers-compiler")
+project(':plugins:better-web-workers:better-web-workers-runtime').projectDir = file("$rootDir/plugins/better-web-workers/better-web-workers-runtime")
+
 project(':kotlin-scripting-ide-services-unshaded').projectDir = "$rootDir/plugins/scripting/scripting-ide-services" as File
 project(':kotlin-scripting-ide-services-test').projectDir = "$rootDir/plugins/scripting/scripting-ide-services-test" as File
 project(':kotlin-scripting-ide-services').projectDir = "$rootDir/plugins/scripting/scripting-ide-services-embeddable" as File
@@ -849,7 +852,4 @@ if (buildProperties.isKotlinNativeEnabled) {
     include ':kotlin-native-shared'
     project(":kotlin-native-shared").projectDir = "$rootDir/kotlin-native/shared" as File
 }
-include 'webworkers'
-include 'plugins:better-web-workers:webworkers'
-findProject(':plugins:better-web-workers:webworkers')?.name = 'webworkers'
 

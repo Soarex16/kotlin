@@ -25,21 +25,8 @@ object ModuleWrapperTranslation {
             ModuleKind.COMMON_JS -> wrapCommonJs(function, importedModules, program)
             ModuleKind.UMD -> wrapUmd(moduleId, function, importedModules, program)
             ModuleKind.PLAIN -> wrapPlain(moduleId, function, importedModules, program)
-            ModuleKind.WORKER -> wrapWorker(moduleId, function, importedModules, program)
             ModuleKind.ES -> error("ES modules are not supported in legacy wrapper")
         }
-    }
-
-    private fun wrapWorker(
-        moduleId: String, function: JsExpression,
-        importedModules: List<JsImportedModule>, program: JsProgram
-    ): List<JsStatement> {
-        return listOf(
-            JsInvocation(
-                JsNameRef("importScripts", JsNameRef("self")),
-                importedModules.map { JsStringLiteral(it.requireName) }
-            ).makeStmt()
-        ) + wrapUmd(moduleId, function, importedModules, program)
     }
 
     private fun wrapUmd(

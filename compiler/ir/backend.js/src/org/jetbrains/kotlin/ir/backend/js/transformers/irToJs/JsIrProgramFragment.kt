@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlin.ir.backend.js.transformers.irToJs
 
+import org.jetbrains.kotlin.ir.backend.js.extensions.IrToJsExtensionKey
 import org.jetbrains.kotlin.ir.backend.js.utils.toJsIdentifier
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.js.backend.ast.*
 
 class JsIrProgramFragment(val packageFqn: String) {
@@ -25,17 +25,16 @@ class JsIrProgramFragment(val packageFqn: String) {
     val polyfills = JsCompositeBlock()
 }
 
-sealed class JsModuleType {
-    object Normal : JsModuleType()
-    class WorkerStub(val workerName: String, val sourceFunction: IrSimpleFunction) : JsModuleType()
+sealed class JsModuleOrigin {
+    object Source : JsModuleOrigin()
+    class Extension(val extensionKey: IrToJsExtensionKey) : JsModuleOrigin()
 }
 
 class JsIrModule(
     val moduleName: String,
     val externalModuleName: String,
     val fragments: List<JsIrProgramFragment>,
-    // to distinguish worker entrypoints from other module types
-    var type: JsModuleType = JsModuleType.Normal
+    var origin: JsModuleOrigin = JsModuleOrigin.Source
 ) {
     fun makeModuleHeader(): JsIrModuleHeader {
         val nameBindings = mutableMapOf<String, String>()
@@ -106,10 +105,11 @@ class CrossModuleDependenciesResolver(private val headers: List<JsIrModuleHeader
         }
 
         val references = mutableMapOf<JsIrModuleHeader, CrossModuleReferences>()
-        val (workerHeaders, moduleHeaders) = headers.partition { it.associatedModule?.type is JsModuleType.WorkerStub }
+        val (generatedByExtensionsHeaders, sourceHeaders) = headers.partition { it.associatedModule?.origin is JsModuleOrigin.Extension }
 
-        moduleHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs() }
-        workerHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs(moduleHeaders) }
+        sourceHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs() }
+        // Generated modules can affect module order, so we separate them explicitly
+        generatedByExtensionsHeaders.associateWithTo(references) { headerToBuilder[it]!!.buildCrossModuleRefs(sourceHeaders) }
 
         return references
     }

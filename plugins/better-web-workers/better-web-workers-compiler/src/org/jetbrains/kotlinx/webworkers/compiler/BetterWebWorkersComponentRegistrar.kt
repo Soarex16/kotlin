@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.webworkers.compiler
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.ir.backend.js.extensions.IrToJsTransformationExtension
 
 class BetterWebWorkersComponentRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean
@@ -15,5 +16,6 @@ class BetterWebWorkersComponentRegistrar : CompilerPluginRegistrar() {
 
     override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
         IrGenerationExtension.registerExtension(BetterWebWorkersLoweringExtension())
+        IrToJsTransformationExtension.registerExtension(WebWorkersIrToJsExtension())
     }
 }

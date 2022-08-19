@@ -124,7 +124,6 @@ object KotlinJavascriptSerializationUtil {
                 ModuleKind.AMD -> JsProtoBuf.Library.Kind.AMD
                 ModuleKind.COMMON_JS -> JsProtoBuf.Library.Kind.COMMON_JS
                 ModuleKind.UMD -> JsProtoBuf.Library.Kind.UMD
-                ModuleKind.WORKER -> error("Worker modules serialization")
                 ModuleKind.ES -> error("Es modules serialization")
             }
             if (builder.kind != moduleProtoKind) {

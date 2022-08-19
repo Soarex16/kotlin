@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.coroutines.webworkers
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.ir.backend.js.extensions.IrToJsTransformationExtension
 import org.jetbrains.kotlin.js.test.ir.AbstractJsIrTest
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.model.TestModule
@@ -15,6 +16,7 @@ import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.RuntimeClasspathProvider
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlinx.webworkers.compiler.BetterWebWorkersLoweringExtension
+import org.jetbrains.kotlinx.webworkers.compiler.WebWorkersIrToJsExtension
 import java.io.File
 
 /*
@@ -43,6 +45,7 @@ class BetterWebWorkersEnvironmentConfigurator(testServices: TestServices) : Envi
         configuration: CompilerConfiguration
     ) {
         IrGenerationExtension.registerExtension(BetterWebWorkersLoweringExtension())
+        IrToJsTransformationExtension.registerExtension(WebWorkersIrToJsExtension())
     }
 }
 

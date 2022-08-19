@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -23,6 +23,12 @@ public class BetterWebWorkersJsIrTestGenerated extends AbstractBetterWebWorkersJ
     @Test
     public void testAllFilesPresentInBox() throws Exception {
         KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/better-web-workers/better-web-workers-compiler/testData/box"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS_IR, true);
+    }
+
+    @Test
+    @TestMetadata("codeColoring.kt")
+    public void testCodeColoring() throws Exception {
+        runTest("plugins/better-web-workers/better-web-workers-compiler/testData/box/codeColoring.kt");
     }
 
     @Test

@@ -8,7 +8,7 @@ package org.jetbrains.kotlin.ir.backend.js.dce
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
-import org.jetbrains.kotlin.ir.backend.js.lower.workers.collectWorkerFunctions
+import org.jetbrains.kotlin.ir.backend.js.extensions.IrToJsTransformationExtension
 import org.jetbrains.kotlin.ir.backend.js.utils.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
@@ -23,8 +23,9 @@ fun eliminateDeadDeclarations(
     modules: Iterable<IrModuleFragment>,
     context: JsIrBackendContext,
     removeUnusedAssociatedObjects: Boolean = true,
+    irToJsTransformationExtensions: List<IrToJsTransformationExtension> = emptyList(),
 ) {
-    val allRoots = buildRoots(modules, context)
+    val allRoots = buildRoots(modules, context, irToJsTransformationExtensions)
 
     val printReachabilityInfo =
         context.configuration.getBoolean(JSConfigurationKeys.PRINT_REACHABILITY_INFO) ||
@@ -86,7 +87,11 @@ private fun IrDeclaration.addRootsTo(
     }
 }
 
-private fun buildRoots(modules: Iterable<IrModuleFragment>, context: JsIrBackendContext): List<IrDeclaration> = buildList {
+private fun buildRoots(
+    modules: Iterable<IrModuleFragment>,
+    context: JsIrBackendContext,
+    irToJsTransformationExtensions: List<IrToJsTransformationExtension>
+): List<IrDeclaration> = buildList {
     val declarationsCollector = object : IrElementVisitorVoid {
         override fun visitElement(element: IrElement): Unit = element.acceptChildrenVoid(this)
         override fun visitBody(body: IrBody): Unit = Unit // Skip
@@ -104,7 +109,13 @@ private fun buildRoots(modules: Iterable<IrModuleFragment>, context: JsIrBackend
         }
     }
 
-    addAll(modules.flatMap { collectWorkerFunctions(it).values })
+    if (irToJsTransformationExtensions.isNotEmpty()) {
+        for (extension in irToJsTransformationExtensions) {
+            for (module in modules) {
+                addAll(extension.getAdditionalDceRoots(module))
+            }
+        }
+    }
 
     val dceRuntimeDiagnostic = context.dceRuntimeDiagnostic
     if (dceRuntimeDiagnostic != null) {

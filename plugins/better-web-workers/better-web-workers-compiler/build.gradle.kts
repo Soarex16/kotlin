@@ -20,6 +20,7 @@ val testRuntime by configurations.creating {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -58,7 +59,7 @@ dependencies {
     testRuntimeOnly(project(":compiler:backend-common"))
     testRuntimeOnly(commonDependency("org.fusesource.jansi", "jansi"))
 
-    testRuntime(project(":plugins:better-web-workers:webworkers")) { isTransitive = false }
+    testRuntime("kotlinx.webworkers:kotlinx-webworkers-annotations:1.2-SNAPSHOT") { isTransitive = false }
     testRuntime("org.jetbrains.kotlinx:atomicfu-js:0.16.1") { isTransitive = false }
     testRuntime("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.5.0") { isTransitive = false }
 }
