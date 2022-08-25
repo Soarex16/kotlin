@@ -33,7 +33,6 @@ fun TestConfigurationBuilder.commonFirWithPluginFrontendConfiguration() {
 
     useConfigurators(
         ::ExtensionRegistrarConfigurator,
-        ::ClasspathProvider,
         ::JsEnvironmentConfigurator,
     )
 }
