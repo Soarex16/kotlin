@@ -1,0 +1,38 @@
+FILE: simple.kt
+    @<ERROR TYPE REF: Symbol not found for RestrictedContext>() public abstract interface WorkerScope : R|kotlin/Any| {
+        @R|kotlin/Deprecated|(message = String(), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.ERROR|) public abstract val window: <ERROR TYPE REF: Symbol not found for Window>
+            public get(): <ERROR TYPE REF: Symbol not found for Window>
+
+    }
+    context(R|WorkerScope|)
+    public final fun workerFun(): R|kotlin/Unit| {
+        R|/safe|()
+        R|/unsafe|()
+    }
+    context(R|WorkerScope|)
+    public final fun safe(): R|kotlin/Int| {
+        ^safe Int(42)
+    }
+    public final fun R|WorkerScope|.safeExtension(): R|kotlin/Int| {
+        ^safeExtension Int(42)
+    }
+    public final fun unsafe(): R|kotlin/Int| {
+        ^unsafe <Unresolved name: window>#.<Unresolved name: outerHeight>#
+    }
+    public final fun main(): R|kotlin/Unit| {
+        R|kotlin/with|<R|<anonymous>|, R|kotlin/Unit|>(object : R|WorkerScope| {
+            private constructor(): R|<anonymous>| {
+                super<R|kotlin/Any|>()
+            }
+
+            public final override val window: <ERROR TYPE REF: Symbol not found for Window>
+                public get(): <ERROR TYPE REF: Symbol not found for Window> {
+                    ^ R|kotlin/TODO|(String(Not yet implemented))
+                }
+
+        }
+        , <L> = with@fun R|<anonymous>|.<anonymous>(): R|kotlin/Unit| <inline=Inline, kind=EXACTLY_ONCE>  {
+            R|/workerFun|()
+        }
+        )
+    }
