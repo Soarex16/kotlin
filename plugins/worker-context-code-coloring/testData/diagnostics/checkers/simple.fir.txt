@@ -1,0 +1,47 @@
+FILE: simple.kt
+    @R|org/jetbrains/kotlin/code/coloring/RestrictedContext|(allowedPackages = <implicitArrayOf>(String(kotlin))) public abstract interface WorkerScope : R|kotlin/Any| {
+        @R|kotlin/Deprecated|(message = String(), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.ERROR|) public abstract val window: R|org/w3c/dom/Window|
+            public get(): R|org/w3c/dom/Window|
+
+    }
+    context(R|WorkerScope|)
+    public final fun workerFun(): R|kotlin/Unit| {
+        R|/safe|()
+        R|/unsafe|()
+        R|/safeWithoutMark|()
+        lval x: R|kotlin/collections/List<kotlin/Int>| = R|kotlin/collections/listOf|<R|kotlin/Int|>(vararg(Int(1), Int(2), Int(3)))
+        lval y: R|kotlin/collections/List<kotlin/Int>| = R|<local>/x|.R|kotlin/collections/map|<R|kotlin/Int|, R|kotlin/Int|>(<L> = map@fun <anonymous>(it: R|kotlin/Int|): R|kotlin/Int| <inline=Inline, kind=UNKNOWN>  {
+            ^ R|<local>/it|.R|kotlin/Int.plus|(Int(1))
+        }
+        )
+    }
+    context(R|WorkerScope|)
+    public final fun safe(): R|kotlin/Int| {
+        ^safe Int(42)
+    }
+    public final fun R|WorkerScope|.safeExtension(): R|kotlin/Int| {
+        ^safeExtension Int(42)
+    }
+    public final fun safeWithoutMark(): R|kotlin/Int| {
+        ^safeWithoutMark Int(42)
+    }
+    public final fun unsafe(): R|kotlin/Int| {
+        ^unsafe R|kotlinx/browser/window|.R|org/w3c/dom/Window.outerHeight|
+    }
+    public final fun main(): R|kotlin/Unit| {
+        R|kotlin/with|<R|<anonymous>|, R|kotlin/Unit|>(object : R|WorkerScope| {
+            private constructor(): R|<anonymous>| {
+                super<R|kotlin/Any|>()
+            }
+
+            @R|kotlin/Deprecated|(message = String(), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.ERROR|) public final override val window: R|org/w3c/dom/Window|
+                public get(): R|org/w3c/dom/Window| {
+                    ^ R|kotlin/TODO|(String(Not yet implemented))
+                }
+
+        }
+        , <L> = with@fun R|<anonymous>|.<anonymous>(): R|kotlin/Unit| <inline=Inline, kind=EXACTLY_ONCE>  {
+            R|/workerFun|()
+        }
+        )
+    }
