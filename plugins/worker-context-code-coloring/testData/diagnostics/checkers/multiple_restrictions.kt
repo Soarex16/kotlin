@@ -16,8 +16,11 @@ fun foo_bar() {
 
 context(FooCtx)
 fun foo() {
+    // TODO: lambdas and enclosing functions
     with(BarCtx) {
         both_ctx()
+        // works only because enclosing function is ''/with'', not foo
+        // at the same time with call should remove restriction from outer scopes
     }
 }
 
