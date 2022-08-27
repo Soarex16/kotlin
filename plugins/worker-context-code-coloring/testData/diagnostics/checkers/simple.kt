@@ -1,8 +1,9 @@
+// WITH_STDLIB
 import org.jetbrains.kotlin.code.coloring.RestrictedContext
 import org.w3c.dom.Window
 import kotlinx.browser.window
 
-@RestrictedContext
+@RestrictedContext([ "kotlin" ])
 interface WorkerScope {
     @Deprecated("", level = DeprecationLevel.ERROR)
     // такая форма записи плоха тем, что мы выбираем имя переменной так,
@@ -13,7 +14,10 @@ interface WorkerScope {
 context(WorkerScope)
 fun workerFun() {
     safe() // ok
-    unsafe() // not ok
+    <!ILLEGAL_RESTRICTED_FUNCTION_CALL!>unsafe()<!> // not ok
+    <!ILLEGAL_RESTRICTED_FUNCTION_CALL!>safeWithoutMark()<!> // not ok
+    val x = listOf(1, 2, 3)
+    val y = x.map { it + 1 }
 }
 
 context(WorkerScope)
@@ -24,6 +28,10 @@ fun safe(): Int {
 // С точки зрения вычислительной семантики тут все ок,
 // но с учетом синтаксиса контекстов выглядит странно
 fun WorkerScope.safeExtension(): Int {
+    return 42
+}
+
+fun safeWithoutMark(): Int {
     return 42
 }
 

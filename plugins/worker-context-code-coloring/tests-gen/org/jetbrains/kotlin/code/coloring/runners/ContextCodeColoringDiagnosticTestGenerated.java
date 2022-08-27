@@ -34,6 +34,18 @@ public class ContextCodeColoringDiagnosticTestGenerated extends AbstractContextC
         }
 
         @Test
+        @TestMetadata("multiple_contexts.kt")
+        public void testMultiple_contexts() throws Exception {
+            runTest("plugins/worker-context-code-coloring/testData/diagnostics/checkers/multiple_contexts.kt");
+        }
+
+        @Test
+        @TestMetadata("multiple_restrictions.kt")
+        public void testMultiple_restrictions() throws Exception {
+            runTest("plugins/worker-context-code-coloring/testData/diagnostics/checkers/multiple_restrictions.kt");
+        }
+
+        @Test
         @TestMetadata("simple.kt")
         public void testSimple() throws Exception {
             runTest("plugins/worker-context-code-coloring/testData/diagnostics/checkers/simple.kt");

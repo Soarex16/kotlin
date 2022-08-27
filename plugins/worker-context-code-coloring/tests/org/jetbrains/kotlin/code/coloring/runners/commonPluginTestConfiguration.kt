@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.code.coloring.runners
 
-import org.jetbrains.kotlin.code.coloring.services.ClasspathProvider
 import org.jetbrains.kotlin.code.coloring.services.ExtensionRegistrarConfigurator
 import org.jetbrains.kotlin.code.coloring.services.RuntimeClasspathProvider
 import org.jetbrains.kotlin.platform.js.JsPlatforms

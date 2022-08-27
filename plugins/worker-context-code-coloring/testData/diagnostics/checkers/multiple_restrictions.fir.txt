@@ -1,0 +1,35 @@
+FILE: multiple_restrictions.kt
+    @R|org/jetbrains/kotlin/code/coloring/RestrictedContext|(allowedPackages = <implicitArrayOf>(String(kotlin))) public final object FooCtx : R|kotlin/Any| {
+        private constructor(): R|FooCtx| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|org/jetbrains/kotlin/code/coloring/RestrictedContext|(allowedPackages = <implicitArrayOf>(String(kotlin))) public final object BarCtx : R|kotlin/Any| {
+        private constructor(): R|BarCtx| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    context(R|FooCtx|, R|BarCtx|)
+    public final fun foo_bar(): R|kotlin/Unit| {
+        R|/foo|()
+        R|/bar|()
+        R|/both_ctx|()
+        R|/empty_ctx|()
+    }
+    context(R|FooCtx|)
+    public final fun foo(): R|kotlin/Unit| {
+        R|kotlin/with|<R|BarCtx|, R|kotlin/Unit|>(Q|BarCtx|, <L> = with@fun R|BarCtx|.<anonymous>(): R|kotlin/Unit| <inline=Inline, kind=EXACTLY_ONCE>  {
+            R|/both_ctx|()
+        }
+        )
+    }
+    context(R|BarCtx|)
+    public final fun bar(): R|kotlin/Unit| {
+    }
+    context(R|FooCtx|, R|BarCtx|)
+    public final fun both_ctx(): R|kotlin/Unit| {
+    }
+    public final fun empty_ctx(): R|kotlin/Unit| {
+    }

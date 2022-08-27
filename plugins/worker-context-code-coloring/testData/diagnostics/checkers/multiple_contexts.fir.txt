@@ -1,0 +1,23 @@
+FILE: multiple_contexts.kt
+    public abstract interface SimpleCtx : R|kotlin/Any| {
+    }
+    @R|org/jetbrains/kotlin/code/coloring/RestrictedContext|() public abstract interface RestrictedCtx : R|kotlin/Any| {
+    }
+    context(R|SimpleCtx|, R|RestrictedCtx|)
+    public final fun main(): R|kotlin/Unit| {
+        R|/simple|()
+        R|/restricted|()
+        R|/both_ctx|()
+        R|/empty_ctx|()
+    }
+    context(R|SimpleCtx|)
+    public final fun simple(): R|kotlin/Unit| {
+    }
+    context(R|RestrictedCtx|)
+    public final fun restricted(): R|kotlin/Unit| {
+    }
+    context(R|SimpleCtx|, R|RestrictedCtx|)
+    public final fun both_ctx(): R|kotlin/Unit| {
+    }
+    public final fun empty_ctx(): R|kotlin/Unit| {
+    }

@@ -7,4 +7,4 @@ package org.jetbrains.kotlin.code.coloring
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class RestrictedContext
+annotation class RestrictedContext(val allowedPackages: Array<String> = [])

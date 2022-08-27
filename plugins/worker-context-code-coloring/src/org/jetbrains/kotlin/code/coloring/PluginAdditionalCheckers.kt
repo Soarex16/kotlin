@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.code.coloring
 
-import org.jetbrains.kotlin.code.coloring.checkers.WorkerContextChecker
+import org.jetbrains.kotlin.code.coloring.checkers.ContextRestrictionChecker
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirQualifiedAccessExpressionChecker
@@ -15,7 +15,7 @@ class PluginAdditionalCheckers(session: FirSession) : FirAdditionalCheckersExten
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
         override val qualifiedAccessExpressionCheckers: Set<FirQualifiedAccessExpressionChecker>
             get() = setOf(
-                WorkerContextChecker
+                ContextRestrictionChecker
             )
     }
 }
