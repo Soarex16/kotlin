@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr.man
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr.signatureString
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.util.getPackageFragment
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.Printer
 
@@ -47,33 +46,29 @@ class CallGraphRenderer(private val callGraph: Map<IrFunction, FunctionDeclarati
     }
 
     private fun Printer.renderEdges(functions: Iterable<FunctionDeclarationNode>) {
+        val edges = mutableListOf<String>()
         for (decl in functions) {
             for ((_, edge) in decl.innerCalls) {
                 when (edge) {
-                    is DirectEdge -> println(
-                        nodeNames[decl.ir],
-                        EDGE,
-                        nodeNames[edge.callee.ir],
-                        ";"
-                    )
+                    is DirectEdge -> edges.add("${nodeNames[decl.ir]}${EDGE}${nodeNames[edge.callee.ir]};")
 
                     is MultiEdge -> {
                         for (target in edge.callCandidates) {
-                            println(
-                                nodeNames[decl.ir],
-                                EDGE,
-                                nodeNames[target.ir],
-                                " [style=dashed];"
-                            )
+                            edges.add("${nodeNames[decl.ir]}${EDGE}${nodeNames[target.ir]} [style=dashed];")
                         }
                     }
                 }
             }
         }
+
+        for (edge in edges.sorted()) {
+            println(edge)
+        }
     }
 
     private fun Printer.renderNodes(functionByPackage: Map<FqName, List<IrFunction>>) {
-        for ((packageFqn, functions) in functionByPackage) {
+        val sortedPackages = functionByPackage.entries.sortedBy { it.key.asString() }
+        for ((packageFqn, functions) in sortedPackages) {
             println("subgraph \"cluster_${packageFqn}\" {")
             pushIndent()
 
@@ -81,10 +76,12 @@ class CallGraphRenderer(private val callGraph: Map<IrFunction, FunctionDeclarati
             println("label=\"package ${packageFqn}\";")
             println("color=$RED;")
 
-            for (function in functions) {
-                val functionId = "\"${function.mangleString(false)}\""
+            val sortedFunctions = functions
+                .map { Pair("\"${it.mangleString(false)}\"", it) }
+                .sortedBy { it.first }
+            for ((functionId, function) in sortedFunctions) {
                 nodeNames[function] = functionId
-                println(functionId, " [label=\"${function.signatureString(false)}\"];");
+                println(functionId, " [label=\"${function.signatureString(false)}\"];")
             }
 
             popIndent()
