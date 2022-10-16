@@ -1,0 +1,18 @@
+digraph call_graph {
+
+    subgraph "cluster_bar" {
+        node [style=filled];
+        label="package bar";
+        color=red;
+        "bar#bar(){}" [label="bar(){}"];
+    }
+    subgraph "cluster_foo" {
+        node [style=filled];
+        label="package foo";
+        color=red;
+        "foo#foo(){}" [label="foo(){}"];
+        "foo#bar(){}" [label="bar(){}"];
+    }
+    "foo#foo(){}" -> "foo#bar(){}";
+    "foo#foo(){}" -> "bar#bar(){}";
+}

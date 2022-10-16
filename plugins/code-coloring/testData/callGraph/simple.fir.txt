@@ -1,0 +1,14 @@
+FILE: file1.kt
+    public final fun foo(): R|kotlin/Unit| {
+        R|/bar|()
+    }
+    public final fun bar(): R|kotlin/Unit| {
+        R|/baz|()
+        R|/sum|(Int(1), Int(2))
+    }
+FILE: file2.kt
+    public final fun baz(): R|kotlin/Unit| {
+    }
+    public final fun sum(a: R|kotlin/Int|, b: R|kotlin/Int|): R|kotlin/Int| {
+        ^sum R|<local>/a|.R|kotlin/Int.plus|(R|<local>/b|)
+    }

@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.assignment.plugin.AbstractFirBlackBoxCodegenTestForA
 import org.jetbrains.kotlin.assignment.plugin.AbstractFirAssignmentPluginDiagnosticTest
 import org.jetbrains.kotlin.assignment.plugin.AbstractIrBlackBoxCodegenTestAssignmentPlugin
 import org.jetbrains.kotlin.assignment.plugin.AbstractAssignmentPluginDiagnosticTest
+import org.jetbrains.kotlin.code.coloring.runners.AbstractCallGraphTest
 import org.jetbrains.kotlin.fir.plugin.runners.AbstractFirPluginBlackBoxCodegenTest
 import org.jetbrains.kotlin.fir.plugin.runners.AbstractFirPluginDiagnosticTest
 import org.jetbrains.kotlin.generators.TestGroup
@@ -229,6 +230,12 @@ fun main(args: Array<String>) {
 
             testClass<AbstractFirParcelizeDiagnosticTest> {
                 model("diagnostics", excludedPattern = excludedFirTestdataPattern)
+            }
+        }
+
+        testGroup("plugins/code-coloring/tests-gen", "plugins/code-coloring/testData") {
+            testClass<AbstractCallGraphTest> {
+                model("callGraph")
             }
         }
 

@@ -1,0 +1,15 @@
+digraph call_graph {
+
+    subgraph "cluster_<root>" {
+        node [style=filled];
+        label="package <root>";
+        color=red;
+        "#foo(){}" [label="foo(){}"];
+        "#bar(){}" [label="bar(){}"];
+        "#baz(){}" [label="baz(){}"];
+        "#sum(kotlin.Int;kotlin.Int){}" [label="sum(kotlin.Int;kotlin.Int){}"];
+    }
+    "#foo(){}" -> "#bar(){}";
+    "#bar(){}" -> "#baz(){}";
+    "#bar(){}" -> "#sum(kotlin.Int;kotlin.Int){}";
+}

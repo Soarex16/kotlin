@@ -1,0 +1,14 @@
+FILE: file2.kt
+    package bar
+
+    public final fun bar(): R|kotlin/Unit| {
+    }
+FILE: file1.kt
+    package foo
+
+    public final fun foo(): R|kotlin/Unit| {
+        R|foo/bar|()
+        Q|bar|.R|bar/bar|()
+    }
+    public final fun bar(): R|kotlin/Unit| {
+    }

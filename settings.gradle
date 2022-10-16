@@ -173,6 +173,9 @@ include ":benchmarks",
         ":kotlin-android-extensions",
         ":kotlin-android-extensions-runtime"
 
+include ":plugins:code-coloring",
+        ":plugins:code-coloring:plugin-annotations"
+
 include ":kotlin-allopen-compiler-plugin",
         ":kotlin-allopen-compiler-plugin.common",
         ":kotlin-allopen-compiler-plugin.k1",

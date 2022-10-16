@@ -1,0 +1,8 @@
+FILE: overrides.kt
+    public final fun foo(): R|kotlin/Unit| {
+        R|/bar|(Int(12))
+    }
+    public final fun bar(): R|kotlin/Unit| {
+    }
+    public final fun bar(x: R|kotlin/Int|): R|kotlin/Unit| {
+    }
