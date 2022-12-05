@@ -1,0 +1,45 @@
+FILE: indirect_recursion.kt
+    public final fun f1(): R|kotlin/Unit| {
+        R|/f2|()
+        R|/g1|()
+        R|/g2|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithIO|() public final fun f2(): R|kotlin/Unit| {
+        R|/f3|()
+    }
+    public final fun f3(): R|kotlin/Unit| {
+        R|/f4|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithoutIO|() public final fun f4(): R|kotlin/Unit| {
+        R|/f1|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithoutIO|() public final fun g1(): R|kotlin/Unit| {
+    }
+    public final fun g2(): R|kotlin/Unit| {
+        R|/h1|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithoutIO|() public final fun h1(): R|kotlin/Unit| {
+    }
+    public final fun a1(): R|kotlin/Unit| {
+        R|/g1|()
+    }
+    public final fun b1(): R|kotlin/Unit| {
+        R|/a1|()
+        R|/g1|()
+        R|/g2|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithoutIO|() public final fun foo1(): R|kotlin/Unit| {
+        R|/foo2|()
+    }
+    public final fun foo2(): R|kotlin/Unit| {
+        R|/h1|()
+        R|/foo3|()
+    }
+    @R|org/jetbrains/kotlin/code/coloring/CodeWithoutIO|() public final fun foo3(): R|kotlin/Unit| {
+        R|/foo1|()
+    }
+    public final fun main(): R|kotlin/Unit| {
+        R|/f1|()
+        R|/b1|()
+        R|/foo1|()
+    }

@@ -8,8 +8,7 @@ annotation class CodeColor(val color: Int)
 // user lib
 
 @CodeColor(42) // some unique color
-@Target(AnnotationTarget.FUNCTION)
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.VALUE_PARAMETER)
 annotation class UnitTestCode
 
 // user code

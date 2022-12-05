@@ -10,21 +10,21 @@ digraph call_graph {
         node [style=filled];
         label="cluster 2";
         color=red;
-        "#bar(){}" [label="#bar(){}",];
+        "Test#<init>(){}" [label="Test#<init>(){}",];
     }
     subgraph "cluster_3" {
         node [style=filled];
         label="cluster 3";
         color=red;
-        "#sum(kotlin.Int;kotlin.Int){}" [label="#sum(kotlin.Int;kotlin.Int){}",];
+        "kotlin.Any#<init>(){}" [label="kotlin.Any#<init>(){}",];
     }
     subgraph "cluster_4" {
         node [style=filled];
         label="cluster 4";
         color=red;
-        "#baz(){}" [label="#baz(){}",];
+        "Test#testFun(){}" [label="Test#testFun(){}",];
     }
-    "#bar(){}" -> "#baz(){}";
-    "#bar(){}" -> "#sum(kotlin.Int;kotlin.Int){}";
-    "#foo(){}" -> "#bar(){}";
+    "#foo(){}" -> "Test#<init>(){}";
+    "#foo(){}" -> "Test#testFun(){}";
+    "Test#<init>(){}" -> "kotlin.Any#<init>(){}";
 }

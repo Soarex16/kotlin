@@ -1,0 +1,65 @@
+FILE: unit_test.kt
+    public abstract class Test : R|kotlin/Any| {
+        public constructor(): R|Test| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|org/jetbrains/kotlin/code/coloring/CodeWithIO|() public abstract fun run(): R|kotlin/Unit|
+
+    }
+    public open class TestImpl : R|Test| {
+        public constructor(): R|TestImpl| {
+            super<R|Test|>()
+        }
+
+        public open override fun run(): R|kotlin/Unit| {
+            R|kotlin/io/println|(String(test impl))
+        }
+
+    }
+    public final class TestImplImpl : R|TestImpl| {
+        public constructor(): R|TestImplImpl| {
+            super<R|TestImpl|>()
+        }
+
+        public final override fun run(): R|kotlin/Unit| {
+            R|kotlin/io/println|(String(test impl impl))
+        }
+
+    }
+    public abstract class OpaqueTestWrapper : R|Test| {
+        public constructor(): R|OpaqueTestWrapper| {
+            super<R|Test|>()
+        }
+
+    }
+    public final class TestImplImplWrapper : R|OpaqueTestWrapper| {
+        public constructor(): R|TestImplImplWrapper| {
+            super<R|OpaqueTestWrapper|>()
+        }
+
+        public final override fun run(): R|kotlin/Unit| {
+            R|kotlin/io/println|(String(test impl impl))
+        }
+
+    }
+    public final fun runTest(test: R|() -> kotlin/Unit|): R|kotlin/Unit| {
+        try {
+            R|<local>/test|.R|SubstitutionOverride<kotlin/Function0.invoke: R|kotlin/Unit|>|()
+        }
+        catch (e: R|kotlin/Throwable|) {
+        }
+        finally {
+        }
+
+    }
+    public final fun main(): R|kotlin/Unit| {
+        lval impl3: R|TestImplImplWrapper| = R|/TestImplImplWrapper.TestImplImplWrapper|()
+        lval impl2: R|TestImplImpl| = R|/TestImplImpl.TestImplImpl|()
+        lval impl: R|TestImpl| = R|/TestImpl.TestImpl|()
+        lval base: R|Test| = R|/TestImpl.TestImpl|()
+        R|/runTest|(R|<local>/impl3|::R|/TestImplImplWrapper.run|)
+        R|/runTest|(R|<local>/impl2|::R|/TestImplImpl.run|)
+        R|/runTest|(R|<local>/impl|::R|/TestImpl.run|)
+        R|/runTest|(R|<local>/base|::R|/Test.run|)
+    }

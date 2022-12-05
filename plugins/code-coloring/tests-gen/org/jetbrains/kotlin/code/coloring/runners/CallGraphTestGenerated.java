@@ -44,6 +44,12 @@ public class CallGraphTestGenerated extends AbstractCallGraphTest {
     }
 
     @Test
+    @TestMetadata("indirect_recursion.kt")
+    public void testIndirect_recursion() throws Exception {
+        runTest("plugins/code-coloring/testData/callGraph/indirect_recursion.kt");
+    }
+
+    @Test
     @TestMetadata("multiple_packages.kt")
     public void testMultiple_packages() throws Exception {
         runTest("plugins/code-coloring/testData/callGraph/multiple_packages.kt");
@@ -56,8 +62,20 @@ public class CallGraphTestGenerated extends AbstractCallGraphTest {
     }
 
     @Test
+    @TestMetadata("proto.kt")
+    public void testProto() throws Exception {
+        runTest("plugins/code-coloring/testData/callGraph/proto.kt");
+    }
+
+    @Test
     @TestMetadata("simple.kt")
     public void testSimple() throws Exception {
         runTest("plugins/code-coloring/testData/callGraph/simple.kt");
+    }
+
+    @Test
+    @TestMetadata("unit_test.kt")
+    public void testUnit_test() throws Exception {
+        runTest("plugins/code-coloring/testData/callGraph/unit_test.kt");
     }
 }

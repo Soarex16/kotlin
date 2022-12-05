@@ -5,5 +5,8 @@
 
 package org.jetbrains.kotlin.code.coloring
 
-@Target(AnnotationTarget.VALUE_PARAMETER)
-annotation class ColoredFunction
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.TYPE)
+annotation class CodeWithoutIO
+
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.TYPE)
+annotation class CodeWithIO

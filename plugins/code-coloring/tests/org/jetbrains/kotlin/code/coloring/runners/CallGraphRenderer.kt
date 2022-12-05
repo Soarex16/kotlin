@@ -5,21 +5,21 @@
 
 package org.jetbrains.kotlin.code.coloring.runners
 
-import org.jetbrains.kotlin.code.coloring.DirectEdge
-import org.jetbrains.kotlin.code.coloring.FunctionDeclarationNode
-import org.jetbrains.kotlin.code.coloring.MultiEdge
+import org.jetbrains.kotlin.code.coloring.callgraph.CallGraph
+import org.jetbrains.kotlin.code.coloring.callgraph.CallGraphMarker
+import org.jetbrains.kotlin.code.coloring.callgraph.DirectedGraphCondensation
+import org.jetbrains.kotlin.code.coloring.demo.IOCallGraphMarker
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr.mangleString
-import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr.signatureString
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.util.getPackageFragment
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.Printer
 
-class CallGraphRenderer(private val callGraph: Map<IrFunction, FunctionDeclarationNode>, builder: StringBuilder) {
+class CallGraphRenderer(
+    private val callGraph: CallGraph,
+    private val callGraphCondensation: DirectedGraphCondensation<IrFunction>,
+    builder: StringBuilder
+) {
     companion object {
         private const val EDGE = " -> "
-        private const val RED = "red"
-        private const val BLUE = "blue"
     }
 
     private val printer = Printer(builder)
@@ -27,37 +27,25 @@ class CallGraphRenderer(private val callGraph: Map<IrFunction, FunctionDeclarati
     private val nodeNames = mutableMapOf<IrFunction, String>()
 
     fun renderDotGraph() {
-        val functionByPackage = groupFunctionsByPackage(callGraph.keys)
         printer
             .println("digraph call_graph {")
             .pushIndent()
             .println()
 
-        printer.renderNodes(functionByPackage)
-        printer.renderEdges(callGraph.values)
+        printer.renderNodes()
+        printer.renderEdges()
 
         printer
             .popIndent()
             .println("}")
     }
 
-    private fun groupFunctionsByPackage(callGraph: Set<IrFunction>): Map<FqName, List<IrFunction>> {
-        return callGraph.groupBy { it.getPackageFragment().fqName }
-    }
-
-    private fun Printer.renderEdges(functions: Iterable<FunctionDeclarationNode>) {
+    private fun Printer.renderEdges() {
         val edges = mutableListOf<String>()
-        for (decl in functions) {
-            for ((_, edge) in decl.innerCalls) {
-                when (edge) {
-                    is DirectEdge -> edges.add("${nodeNames[decl.ir]}${EDGE}${nodeNames[edge.callee.ir]};")
 
-                    is MultiEdge -> {
-                        for (target in edge.callCandidates) {
-                            edges.add("${nodeNames[decl.ir]}${EDGE}${nodeNames[target.ir]} [style=dashed];")
-                        }
-                    }
-                }
+        for ((caller, callees) in callGraph.reversedEdges) {
+            for (callee in callees) {
+                edges.add("${nodeNames[callee]}${EDGE}${nodeNames[caller]};")
             }
         }
 
@@ -66,26 +54,54 @@ class CallGraphRenderer(private val callGraph: Map<IrFunction, FunctionDeclarati
         }
     }
 
-    private fun Printer.renderNodes(functionByPackage: Map<FqName, List<IrFunction>>) {
-        val sortedPackages = functionByPackage.entries.sortedBy { it.key.asString() }
-        for ((packageFqn, functions) in sortedPackages) {
-            println("subgraph \"cluster_${packageFqn}\" {")
-            pushIndent()
-
-            println("node [style=filled];")
-            println("label=\"package ${packageFqn}\";")
-            println("color=$RED;")
-
-            val sortedFunctions = functions
+    private fun Printer.renderNodes() {
+        var clusterNum = 0
+        for (multiNode in callGraphCondensation.topologicalOrder) {
+            val sortedFunctions = multiNode.nodes
                 .map { Pair("\"${it.mangleString(false)}\"", it) }
                 .sortedBy { it.first }
+
+            println("subgraph \"cluster_${++clusterNum}\" {")
+            pushIndent()
+
+//            println("color=${multiNode.marker!!.propagationColor()};")
+            println("node [style=filled];")
+            println("label=\"cluster ${clusterNum}\";")
+
             for ((functionId, function) in sortedFunctions) {
                 nodeNames[function] = functionId
-                println(functionId, " [label=\"${function.signatureString(false)}\"];")
+                println(
+                    functionId,
+                    " [label=${functionId}, penwidth=2, fillcolor=${callGraph[function].marker.markerColor()}, color=${multiNode.marker!!.propagationColor()}];"
+                )
             }
 
             popIndent()
             println("}")
         }
+    }
+
+    private fun CallGraphMarker<*>.propagationColor(): String {
+        return if (this is IOCallGraphMarker) {
+            return when (this.value) {
+                IOCallGraphMarker.IOSafety.Any -> "black"
+                IOCallGraphMarker.IOSafety.Safe -> "darkgreen"
+                IOCallGraphMarker.IOSafety.Unsafe -> "darkred"
+                IOCallGraphMarker.IOSafety.UnsafeTransitively -> "darkorange4"
+                IOCallGraphMarker.IOSafety.Unknown -> "dodgerblue4"
+            }
+        } else ""
+    }
+
+    private fun CallGraphMarker<*>.markerColor(): String {
+        return if (this is IOCallGraphMarker) {
+            return when (this.value) {
+                IOCallGraphMarker.IOSafety.Any -> "gray"
+                IOCallGraphMarker.IOSafety.Safe -> "darkolivegreen1"
+                IOCallGraphMarker.IOSafety.Unsafe -> "coral1"
+                IOCallGraphMarker.IOSafety.UnsafeTransitively -> "darkorange"
+                IOCallGraphMarker.IOSafety.Unknown -> "dodgerblue"
+            }
+        } else ""
     }
 }

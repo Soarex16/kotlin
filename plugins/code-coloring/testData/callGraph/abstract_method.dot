@@ -1,0 +1,55 @@
+digraph call_graph {
+
+    subgraph "cluster_1" {
+        node [style=filled];
+        label="cluster 1";
+        color=red;
+        "#foo(){}" [label="#foo(){}",];
+    }
+    subgraph "cluster_2" {
+        node [style=filled];
+        label="cluster 2";
+        color=red;
+        "C#<init>(){}" [label="C#<init>(){}",];
+    }
+    subgraph "cluster_3" {
+        node [style=filled];
+        label="cluster 3";
+        color=red;
+        "A#foo(){}" [label="A#foo(){}",];
+    }
+    subgraph "cluster_4" {
+        node [style=filled];
+        label="cluster 4";
+        color=red;
+        "B#<init>(){}" [label="B#<init>(){}",];
+    }
+    subgraph "cluster_5" {
+        node [style=filled];
+        label="cluster 5";
+        color=red;
+        "A#<init>(){}" [label="A#<init>(){}",];
+    }
+    subgraph "cluster_6" {
+        node [style=filled];
+        label="cluster 6";
+        color=red;
+        "kotlin.Any#<init>(){}" [label="kotlin.Any#<init>(){}",];
+    }
+    subgraph "cluster_7" {
+        node [style=filled];
+        label="cluster 7";
+        color=red;
+        "B#foo(){}" [label="B#foo(){}",];
+    }
+    subgraph "cluster_8" {
+        node [style=filled];
+        label="cluster 8";
+        color=red;
+        "C#foo(){}" [label="C#foo(){}",];
+    }
+    "#foo(){}" -> "C#<init>(){}";
+    "A#<init>(){}" -> "kotlin.Any#<init>(){}";
+    "B#<init>(){}" -> "A#<init>(){}";
+    "C#<init>(){}" -> "A#<init>(){}";
+}

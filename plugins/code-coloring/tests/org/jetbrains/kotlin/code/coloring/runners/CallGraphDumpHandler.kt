@@ -5,13 +5,11 @@
 
 package org.jetbrains.kotlin.code.coloring.runners
 
-import org.jetbrains.kotlin.code.coloring.CallGraphGenerationVisitor
+import org.jetbrains.kotlin.code.coloring.callgraph.CallGraphBuilder
+import org.jetbrains.kotlin.code.coloring.callgraph.propagateMarkers
 import org.jetbrains.kotlin.test.backend.handlers.AbstractIrHandler
 import org.jetbrains.kotlin.test.backend.ir.IrBackendInput
-import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
-import org.jetbrains.kotlin.test.frontend.fir.FirOutputArtifact
-import org.jetbrains.kotlin.test.frontend.fir.handlers.FirAnalysisHandler
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.moduleStructure
@@ -26,9 +24,9 @@ class CallGraphDumpHandler(testServices: TestServices) : AbstractIrHandler(testS
 
     override fun processModule(module: TestModule, info: IrBackendInput) {
         if (alreadyDumped || CallGraphDirectives.DUMP_CALL_GRAPH !in module.directives) return
-        val graphBuilder = CallGraphGenerationVisitor()
-        graphBuilder.visitModuleFragment(info.irModuleFragment)
-        CallGraphRenderer(graphBuilder.callGraph, builder).renderDotGraph()
+        val (callGraph, condensation) = CallGraphBuilder.processModuleFragment(info.irModuleFragment)
+        propagateMarkers(callGraph, condensation)
+        CallGraphRenderer(callGraph, condensation, builder).renderDotGraph()
         alreadyDumped = true
     }
 

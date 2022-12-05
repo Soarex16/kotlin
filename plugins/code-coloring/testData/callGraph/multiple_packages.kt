@@ -8,7 +8,7 @@ fun bar() { }
 //FILE: file1.kt
 package foo;
 
-import bar;
+import bar.*;
 
 fun foo() {
     bar()

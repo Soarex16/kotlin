@@ -1,0 +1,34 @@
+FILE: proto.kt
+    @R|kotlin/annotation/Target|(allowedTargets = vararg(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.ANNOTATION_CLASS|)) public final annotation class CodeColor : R|kotlin/Annotation| {
+        public constructor(color: R|kotlin/Int|): R|CodeColor| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val color: R|kotlin/Int| = R|<local>/color|
+            public get(): R|kotlin/Int|
+
+    }
+    @R|CodeColor|(color = Int(42)) @R|kotlin/annotation/Target|(allowedTargets = vararg(Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.FUNCTION|, Q|kotlin/annotation/AnnotationTarget|.R|kotlin/annotation/AnnotationTarget.VALUE_PARAMETER|)) public final annotation class UnitTestCode : R|kotlin/Annotation| {
+        public constructor(): R|UnitTestCode| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public abstract class Test : R|kotlin/Any| {
+        public constructor(): R|Test| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|UnitTestCode|() public abstract fun run(): R|kotlin/Unit|
+
+    }
+    public final fun runTest(@R|UnitTestCode|() test: R|() -> kotlin/Unit|): R|kotlin/Unit| {
+        try {
+            R|<local>/test|.R|SubstitutionOverride<kotlin/Function0.invoke: R|kotlin/Unit|>|()
+        }
+        catch (e: R|kotlin/Throwable|) {
+        }
+        finally {
+        }
+
+    }

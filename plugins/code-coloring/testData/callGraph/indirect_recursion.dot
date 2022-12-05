@@ -1,0 +1,53 @@
+digraph call_graph {
+
+    subgraph "cluster_1" {
+        node [style=filled];
+        label="cluster 1";
+        color=red;
+        "#f1(){}" [label="#f1(){}",];
+        "#f2(){}" [label="#f2(){}",color=coral1];
+        "#f3(){}" [label="#f3(){}",];
+        "#f4(){}" [label="#f4(){}",color=darkolivegreen1];
+    }
+    subgraph "cluster_2" {
+        node [style=filled];
+        label="cluster 2";
+        color=red;
+        "#b1(){}" [label="#b1(){}",];
+    }
+    subgraph "cluster_3" {
+        node [style=filled];
+        label="cluster 3";
+        color=red;
+        "#g2(){}" [label="#g2(){}",];
+    }
+    subgraph "cluster_4" {
+        node [style=filled];
+        label="cluster 4";
+        color=red;
+        "#h1(){}" [label="#h1(){}",color=darkolivegreen1];
+    }
+    subgraph "cluster_5" {
+        node [style=filled];
+        label="cluster 5";
+        color=red;
+        "#a1(){}" [label="#a1(){}",];
+    }
+    subgraph "cluster_6" {
+        node [style=filled];
+        label="cluster 6";
+        color=red;
+        "#g1(){}" [label="#g1(){}",color=darkolivegreen1];
+    }
+    "#a1(){}" -> "#g1(){}";
+    "#b1(){}" -> "#a1(){}";
+    "#b1(){}" -> "#g1(){}";
+    "#b1(){}" -> "#g2(){}";
+    "#f1(){}" -> "#f2(){}";
+    "#f1(){}" -> "#g1(){}";
+    "#f1(){}" -> "#g2(){}";
+    "#f2(){}" -> "#f3(){}";
+    "#f3(){}" -> "#f4(){}";
+    "#f4(){}" -> "#f1(){}";
+    "#g2(){}" -> "#h1(){}";
+}

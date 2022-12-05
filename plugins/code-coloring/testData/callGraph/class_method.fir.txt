@@ -1,0 +1,13 @@
+FILE: class_method.kt
+    public final fun foo(): R|kotlin/Unit| {
+        R|/Test.Test|().R|/Test.testFun|()
+    }
+    public final class Test : R|kotlin/Any| {
+        public constructor(): R|Test| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final fun testFun(): R|kotlin/Unit| {
+        }
+
+    }

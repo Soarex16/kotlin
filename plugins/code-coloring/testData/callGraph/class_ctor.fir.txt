@@ -1,0 +1,14 @@
+FILE: class_ctor.kt
+    public final fun foo(): R|kotlin/Unit| {
+        R|/Test.Test|(Int(12))
+    }
+    public final class Test : R|kotlin/Any| {
+        public constructor(s: R|kotlin/String|): R|Test| {
+            super<R|kotlin/Any|>()
+        }
+
+        public constructor(x: R|kotlin/Int|): R|Test| {
+            this<R|Test|>(R|<local>/x|.R|kotlin/Int.toString|())
+        }
+
+    }

@@ -1,12 +1,22 @@
 digraph call_graph {
 
-    subgraph "cluster_<root>" {
+    subgraph "cluster_1" {
         node [style=filled];
-        label="package <root>";
+        label="cluster 1";
         color=red;
-        "#foo(){}" [label="foo(){}"];
-        "#bar(kotlin.Int){}" [label="bar(kotlin.Int){}"];
-        "#bar(){}" [label="bar(){}"];
+        "#foo(){}" [label="#foo(){}",];
+    }
+    subgraph "cluster_2" {
+        node [style=filled];
+        label="cluster 2";
+        color=red;
+        "#bar(kotlin.Int){}" [label="#bar(kotlin.Int){}",];
+    }
+    subgraph "cluster_3" {
+        node [style=filled];
+        label="cluster 3";
+        color=red;
+        "#bar(){}" [label="#bar(){}",];
     }
     "#foo(){}" -> "#bar(kotlin.Int){}";
 }

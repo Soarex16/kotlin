@@ -1,0 +1,104 @@
+digraph call_graph {
+
+    subgraph "cluster_1" {
+        node [style=filled];
+        label="cluster 1";
+        color=red;
+        "Test#run(){}" [label="Test#run(){}",color=coral1];
+    }
+    subgraph "cluster_2" {
+        node [style=filled];
+        label="cluster 2";
+        color=red;
+        "TestImpl#run(){}" [label="TestImpl#run(){}",];
+    }
+    subgraph "cluster_3" {
+        node [style=filled];
+        label="cluster 3";
+        color=red;
+        "TestImplImpl#run(){}" [label="TestImplImpl#run(){}",];
+    }
+    subgraph "cluster_4" {
+        node [style=filled];
+        label="cluster 4";
+        color=red;
+        "TestImplImplWrapper#run(){}" [label="TestImplImplWrapper#run(){}",];
+    }
+    subgraph "cluster_5" {
+        node [style=filled];
+        label="cluster 5";
+        color=red;
+        "kotlin.io.ConsoleKt#println(kotlin.Any?){}" [label="kotlin.io.ConsoleKt#println(kotlin.Any?){}",];
+    }
+    subgraph "cluster_6" {
+        node [style=filled];
+        label="cluster 6";
+        color=red;
+        "#main(){}" [label="#main(){}",];
+    }
+    subgraph "cluster_7" {
+        node [style=filled];
+        label="cluster 7";
+        color=red;
+        "#runTest(kotlin.Function0<kotlin.Unit>){}" [label="#runTest(kotlin.Function0<kotlin.Unit>){}",];
+    }
+    subgraph "cluster_8" {
+        node [style=filled];
+        label="cluster 8";
+        color=red;
+        "kotlin.Function0#invoke(){}" [label="kotlin.Function0#invoke(){}",];
+    }
+    subgraph "cluster_9" {
+        node [style=filled];
+        label="cluster 9";
+        color=red;
+        "TestImplImpl#<init>(){}" [label="TestImplImpl#<init>(){}",];
+    }
+    subgraph "cluster_10" {
+        node [style=filled];
+        label="cluster 10";
+        color=red;
+        "TestImpl#<init>(){}" [label="TestImpl#<init>(){}",];
+    }
+    subgraph "cluster_11" {
+        node [style=filled];
+        label="cluster 11";
+        color=red;
+        "TestImplImplWrapper#<init>(){}" [label="TestImplImplWrapper#<init>(){}",];
+    }
+    subgraph "cluster_12" {
+        node [style=filled];
+        label="cluster 12";
+        color=red;
+        "OpaqueTestWrapper#<init>(){}" [label="OpaqueTestWrapper#<init>(){}",];
+    }
+    subgraph "cluster_13" {
+        node [style=filled];
+        label="cluster 13";
+        color=red;
+        "Test#<init>(){}" [label="Test#<init>(){}",];
+    }
+    subgraph "cluster_14" {
+        node [style=filled];
+        label="cluster 14";
+        color=red;
+        "kotlin.Any#<init>(){}" [label="kotlin.Any#<init>(){}",];
+    }
+    "#main(){}" -> "#runTest(kotlin.Function0<kotlin.Unit>){}";
+    "#main(){}" -> "#runTest(kotlin.Function0<kotlin.Unit>){}";
+    "#main(){}" -> "#runTest(kotlin.Function0<kotlin.Unit>){}";
+    "#main(){}" -> "#runTest(kotlin.Function0<kotlin.Unit>){}";
+    "#main(){}" -> "TestImpl#<init>(){}";
+    "#main(){}" -> "TestImpl#<init>(){}";
+    "#main(){}" -> "TestImplImpl#<init>(){}";
+    "#main(){}" -> "TestImplImplWrapper#<init>(){}";
+    "#runTest(kotlin.Function0<kotlin.Unit>){}" -> "kotlin.Function0#invoke(){}";
+    "OpaqueTestWrapper#<init>(){}" -> "Test#<init>(){}";
+    "Test#<init>(){}" -> "kotlin.Any#<init>(){}";
+    "TestImpl#<init>(){}" -> "Test#<init>(){}";
+    "TestImpl#run(){}" -> "kotlin.io.ConsoleKt#println(kotlin.Any?){}";
+    "TestImplImpl#<init>(){}" -> "TestImpl#<init>(){}";
+    "TestImplImpl#run(){}" -> "kotlin.io.ConsoleKt#println(kotlin.Any?){}";
+    "TestImplImplWrapper#<init>(){}" -> "OpaqueTestWrapper#<init>(){}";
+    "TestImplImplWrapper#run(){}" -> "kotlin.io.ConsoleKt#println(kotlin.Any?){}";
+}
